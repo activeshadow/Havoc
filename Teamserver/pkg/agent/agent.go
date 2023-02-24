@@ -981,10 +981,10 @@ func (a *Agent) SocksServerRemove(Addr string) {
 }
 
 func (a *Agent) ToMap() map[string]interface{} {
-	var TempParent = a.Pivots.Parent
-	var InfoMap = structs.Map(a)
-
+	ParentAgent := a.Pivots.Parent
 	a.Pivots.Parent = nil
+
+	InfoMap := structs.Map(a)
 
 	InfoMap["Info"].(map[string]interface{})["Listener"] = nil
 
@@ -993,13 +993,12 @@ func (a *Agent) ToMap() map[string]interface{} {
 	delete(InfoMap, "JobQueue")
 	delete(InfoMap, "Parent")
 
-	var TempMagic = fmt.Sprintf("%x", a.Info.MagicValue)
+	InfoMap["MagicValue"] = fmt.Sprintf("%x", a.Info.MagicValue)
 
-	if TempParent != nil {
-		InfoMap["PivotParent"] = a.NameID
+	if ParentAgent != nil {
+		InfoMap["PivotParent"] = ParentAgent.NameID
+		a.Pivots.Parent = ParentAgent
 	}
-
-	InfoMap["MagicValue"] = TempMagic
 
 	return InfoMap
 }
